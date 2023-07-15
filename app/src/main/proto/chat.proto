@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.tieuvy.android.grpc_kotlin";
+option java_outer_classname = "ChatProto";
+option objc_class_prefix = "GRT";
+
+package Chat;
+
+// The greeting service definition.
+service Chat {
+  //unary call
+  rpc JoinRoom (JoinRoomRequest) returns (JoinRoomResponse){}
+
+  //bi-directional_streaming
+  rpc SendMessage (stream messageRequest) returns (stream messageResponse) {}
+
+  //server_streaming
+  rpc registerOtherUserAction(Empty) returns (stream actionResponse);
+
+  //client_streaming
+  rpc sendMyAction(stream actionRequest) returns (Empty);
+
+
+}
+
+message Empty{
+
+}
+
+enum Action{
+  TYPING = 0;
+  SEEN = 1;
+  DISCONNECT = 2;
+  CONNECT = 3;
+  NORMAL = 4;
+}
+
+message actionRequest{
+  Action action = 1;
+  int64  actionAt = 2;
+}
+message actionResponse{
+  UserInfo userInfo = 1;
+  actionRequest action = 2;
+}
+
+message messageRequest {
+  string message = 1;
+  int64  sendAt = 2;
+}
+message messageResponse{
+  messageRequest message =1;
+  UserInfo sender = 2;
+}
+message UserInfo {
+  string id = 1;
+  string name = 2;
+}
+
+message JoinRoomRequest {
+  UserInfo userInfo = 1;
+  int64 joinAt = 2;
+}
+
+message JoinRoomResponse{
+  repeated UserInfo userInfoList = 1;
+  repeated messageResponse oldMessage = 2;
+}
